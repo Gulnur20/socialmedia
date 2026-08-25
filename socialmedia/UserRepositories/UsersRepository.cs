@@ -4,12 +4,13 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using socialmedia.Models;
 
-namespace socialmedia.ado.net
+namespace socialmedia.ado.UserRepostories
+
 {
-    public class User
+    public class UsersRepository 
     {
         private readonly string _connectionString = "Server=localhost;Database=SosyalMedyaDB;Trusted_Connection=True;TrustServerCertificate=True;";
-            public User()
+            public UsersRepository()
             {
             }
              public List<Users> GetAllUsers()
