@@ -1,4 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using socialmedia.Context;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<WebDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 
