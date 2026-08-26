@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using socialmedia.DataTransferObject;
+using Microsoft.Extensions.Configuration;
 using socialmedia.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace socialmedia.Repositories
         {
             _connectionString = configuration.GetConnectionString("Default");
         }
-        public List<FollowRequestDTO> GetWaitingFollowRequests(int userId)
+        public async Task<List<FollowRequestDTO>> GetWaitingFollowRequestsAsync(int userId)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -34,15 +34,16 @@ namespace socialmedia.Repositories
                     WHERE fr.FollowingID = @UserId
                     ORDER BY fr.RequestDate DESC";
 
-                return connection.Query<FollowRequestDTO>(sql, new { UserId = userId }).ToList();
+                var result = await connection.QueryAsync<FollowRequestDTO>(sql, new { UserId = userId });
+                return result.AsList();
             }
         }
-        public bool FollowUser(int followerID, int followingID)
+        public async Task<bool> FollowUserAsync(int followerID, int followingID)    
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 string checkSql = "SELECT IsPrivate FROM UserProfile WHERE UserID = @FollowingID";
-                bool isPrivate = connection.QueryFirstOrDefault<bool>(checkSql, new { FollowingID = followingID });
+                bool isPrivate = await connection.QueryFirstOrDefaultAsync<bool>(checkSql, new { FollowingID = followingID });
 
                 string sql = "";
 
@@ -63,13 +64,11 @@ namespace socialmedia.Repositories
                             INSERT INTO Follows (FollowerID, FollowingID, FollowDate) 
                             VALUES (@FollowerID, @FollowingID, GETDATE());
 
-                            -- Hedef kişinin takipçi sayısını artır
                             UPDATE UserProfile SET FollowerCount = FollowerCount + 1 WHERE UserID = @FollowingID;
-                            -- Takip edenin takip ettiği sayısını artır
                             UPDATE UserProfile SET FollowingCount = FollowingCount + 1 WHERE UserID = @FollowerID;
                         END";
                 }
-                int rowsAffected = connection.Execute(sql, new { FollowerID = followerID, FollowingID = followingID });
+                int rowsAffected = await connection.ExecuteAsync(sql, new { FollowerID = followerID, FollowingID = followingID });
                 return rowsAffected > 0;
             }
         }
