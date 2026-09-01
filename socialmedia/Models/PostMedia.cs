@@ -1,12 +1,19 @@
 ﻿namespace socialmedia.Models
 {
+    public enum MediaType : byte
+    {
+        Image = 1,
+        Video = 2
+    }
+
     public class PostMedia
     {
-        public int MediaID { get; set; }
-        public int PostID { get; set; }
+        public long MediaID { get; set; }
+        public long PostID { get; set; }
         public string MediaURL { get; set; }
-        public string MediaType { get; set; }
-        public string DisplayOrder { get; set; }
+        public  MediaType MediaType { get; set;}
+        public byte DisplayOrder { get; set; }
+        public MainPost? MainPost { get; set; }
 
     }
 }
