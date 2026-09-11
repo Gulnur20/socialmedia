@@ -7,6 +7,8 @@ namespace socialmedia.Services.Interfaces
     {
         Task<MyProfileDto> GetMyProfileAsync(long userId);
         Task<UserProfileDto> GetUserProfileAsync(long targetUserId, long currentUserId);
+        Task<List<UserSearchResultDto>> SearchUsersAsync(string query);
+        Task ChangePasswordAsync(long userId, ChangePasswordDto dto);
         Task UpdateUserProfileAsync(long userId, UpdateProfileDto dto);
         Task UpdateUserSettingsAsync(long userId, UpdateSettingsDto dto);
         Task FreezeAccountAsync(long userId);

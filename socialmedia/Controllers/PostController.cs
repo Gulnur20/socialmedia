@@ -71,6 +71,13 @@ namespace socialmedia.Controllers
             return Ok(new { isLiked = isNowLiked });
         }
 
+        [HttpGet("{id}/likes")]
+        public async Task<ActionResult<List<PostLikeDto>>> GetPostLikes(long id)
+        {
+            var result = await _postService.GetPostLikesAsync(id);
+            return Ok(result);
+        }
+
         [Authorize]
         [HttpGet("timeline")]
         public async Task<ActionResult<PagedResultDto<PostDto>>> GetTimeline(
@@ -79,6 +86,17 @@ namespace socialmedia.Controllers
         {
             long userId = GetCurrentUserId();
             var result = await _postService.GetTimelineAsync(userId, page, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<List<PostDto>>> GetPostsByUserId(long userId)
+        {
+            long currentUserId = User.Identity?.IsAuthenticated == true
+                ? GetCurrentUserId()
+                : 0;
+
+            var result = await _postService.GetPostsByUserIdAsync(userId, currentUserId);
             return Ok(result);
         }
 

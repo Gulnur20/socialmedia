@@ -29,6 +29,7 @@ namespace socialmedia.Controllers
             return Ok(result);
 
         }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<UserProfileDto>> GetUserProfile(long id)
         {
@@ -37,6 +38,14 @@ namespace socialmedia.Controllers
               : 0;
 
             var result = await _userService.GetUserProfileAsync(id, currentUserId);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("search")]
+        public async Task<ActionResult<List<UserSearchResultDto>>> SearchUsers([FromQuery] string query)
+        {
+            var result = await _userService.SearchUsersAsync(query);
             return Ok(result);
         }
         [Authorize]
@@ -59,6 +68,15 @@ namespace socialmedia.Controllers
 
         [Authorize]
         [HttpPost("freeze")]
+
+        [Authorize]
+        [HttpPut("password")]
+        public async Task<ActionResult> ChangePassword(ChangePasswordDto dto)
+        {
+            long userId = GetCurrentUserId();
+            await _userService.ChangePasswordAsync(userId, dto);
+            return NoContent();
+        }
         public async Task<ActionResult> FreezeAccount()
         {
             long userId = GetCurrentUserId();

@@ -46,11 +46,32 @@ namespace socialmedia.Repositories
             return await _context.MainPosts
                 .Include(p => p.PostMedia)
                 .Include(p => p.User)
+                .Include(p => p.PostLikes)
                 .FirstOrDefaultAsync(p => p.PostID == postId);
+        }
+
+        public async Task<List<PostLike>> GetPostLikesAsync(long postId)
+        {
+            return await _context.PostsLikes
+                .Where(l => l.PostID == postId)
+                .OrderByDescending(l => l.PostLikedDate)
+                .ToListAsync();
         }
         public async Task<int> GetPostCountByUserIdAsync(long userId)
         {
             return await _context.MainPosts.CountAsync(p => p.UserID == userId);
+        
+        }
+
+        public async Task<List<MainPost>> GetPostsByUserIdAsync(long userId)
+        {
+            return await _context.MainPosts
+                .Where(p => p.UserID == userId)
+                .Include(p => p.PostMedia)
+                .Include(p => p.User)
+                .Include(p => p.PostLikes)
+                .OrderByDescending(p => p.PostCreated)
+                .ToListAsync();
         }
         public async Task<(List<MainPost> Posts, int TotalCount)> GetTimelineAsync(List<long> followingIds, int page, int pageSize)
         {
@@ -63,6 +84,7 @@ namespace socialmedia.Repositories
             var posts = await query
                 .Include(p => p.PostMedia)
                 .Include(p => p.User)
+                .Include(p => p.PostLikes)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -70,7 +92,7 @@ namespace socialmedia.Repositories
             return (posts, totalCount);
         }
 
-      
+
         public async Task<long?> GetPostOwnerIdAsync(long postId)
         {
             var post = await _context.MainPosts.FirstOrDefaultAsync(p => p.PostID == postId);

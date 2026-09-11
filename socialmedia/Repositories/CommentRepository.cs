@@ -40,6 +40,7 @@ namespace socialmedia.Repositories
         {
             return await _context.Comments
                 .Include(c => c.User)
+                .Include(c => c.CommentLikes)
                 .Where(c => c.PostID == postId && c.ParentCommentID == null)
                 .OrderByDescending(c => c.CommentDate)
                 .ToListAsync();
@@ -56,6 +57,7 @@ namespace socialmedia.Repositories
         {
             return await _context.Comments
                 .Include(c => c.User)
+                .Include(c => c.CommentLikes)
                 .Where(c => c.PostID == postId && c.ParentCommentID != null)
                 .OrderBy(c => c.CommentDate)
                 .ToListAsync();
@@ -64,6 +66,7 @@ namespace socialmedia.Repositories
         {
             return await _context.Comments
                 .Include(c => c.User)
+                .Include(c => c.CommentLikes)
                 .FirstOrDefaultAsync(c => c.CommentID == commentId);
         }
 
@@ -99,7 +102,7 @@ namespace socialmedia.Repositories
                 var commentLikes = _context.CommentsLikes.Where(cl => cl.CommentID == commentId);
                 _context.CommentsLikes.RemoveRange(commentLikes);
 
-                
+
                 var replies = _context.Comments.Where(c => c.ParentCommentID == commentId);
                 _context.Comments.RemoveRange(replies);
 
@@ -157,4 +160,3 @@ namespace socialmedia.Repositories
 
     }
 }
-

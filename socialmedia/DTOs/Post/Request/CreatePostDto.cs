@@ -7,7 +7,7 @@ namespace socialmedia.DTOs.Post.Request
         [Required]
         public string Url { get; set; }
 
-        // Client "Image" ya da "Video" gönderecek (büyük/küçük harf duyarsız).
+       
         [Required]
         public string MediaType { get; set; }
     }

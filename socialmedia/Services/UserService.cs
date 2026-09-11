@@ -90,5 +90,27 @@ namespace socialmedia.Services
         public async Task FreezeAccountAsync(long userId) => await _usersRepository.UpdateStatusAsync(userId, false);
         public async Task ActivateAccountAsync(long userId) => await _usersRepository.UpdateStatusAsync(userId, true);
         public async Task DeleteAccountAsync(long userId) => await _usersRepository.DeleteUserAsync(userId, DateTime.UtcNow);
+        public async Task<List<UserSearchResultDto>> SearchUsersAsync(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return new List<UserSearchResultDto>();
+
+            return await _usersRepository.SearchUsersAsync(query);
+        }
+
+        public async Task ChangePasswordAsync(long userId, ChangePasswordDto dto)
+        {
+            var currentHash = await _usersRepository.GetPasswordHashAsync(userId);
+            if (currentHash == null)
+                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+
+            bool isValid = BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, currentHash);
+            if (!isValid)
+                throw new ArgumentException("Mevcut şifre yanlış.");
+
+            string newHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            await _usersRepository.UpdatePasswordAsync(userId, newHash);
+        }
+
     }
 }

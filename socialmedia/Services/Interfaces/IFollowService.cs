@@ -1,4 +1,5 @@
 ﻿using socialmedia.DTOs.Follow.Response;
+using socialmedia.DTOs.Users.Response;
 
 namespace socialmedia.Services.Interfaces
 {
@@ -10,5 +11,7 @@ namespace socialmedia.Services.Interfaces
         Task<List<FollowRequestDto>> GetWaitingFollowRequestsAsync(long userId);
         Task AcceptFollowRequestAsync(long requestId);
         Task RejectFollowRequestAsync(long requestId);
+        Task<List<UserSummaryDto>> GetFollowersAsync(long userId);
+        Task<List<UserSummaryDto>> GetFollowingAsync(long userId);
     }
 }

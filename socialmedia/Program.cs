@@ -11,7 +11,16 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 builder.Services.AddControllers();
 //https: //aka.ms/aspnet/openapi 
@@ -50,6 +59,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 app.UseMiddleware<socialmedia.Middleware.ExceptionMiddleware>();
+app.UseCors("AllowReactApp");
 
 
 if (app.Environment.IsDevelopment())
@@ -57,6 +67,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

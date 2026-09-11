@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using socialmedia.DTOs.Follow.Response;
+using socialmedia.DTOs.Users.Response;
 using socialmedia.Services.Interfaces;
 using System.Security.Claims;
 namespace socialmedia.Controllers
@@ -40,6 +41,19 @@ namespace socialmedia.Controllers
         {
             long userId = GetCurrentUserId();
             var result = await _followService.GetWaitingFollowRequestsAsync(userId);
+            return Ok(result);
+        }
+        [HttpGet("followers/{userId}")]
+        public async Task<ActionResult<List<UserSummaryDto>>> GetFollowers(long userId)
+        {
+            var result = await _followService.GetFollowersAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("following/{userId}")]
+        public async Task<ActionResult<List<UserSummaryDto>>> GetFollowing(long userId)
+        {
+            var result = await _followService.GetFollowingAsync(userId);
             return Ok(result);
         }
 

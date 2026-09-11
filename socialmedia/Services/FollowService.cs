@@ -1,5 +1,6 @@
 ﻿using socialmedia.DTOs;
 using socialmedia.DTOs.Follow.Response;
+using socialmedia.DTOs.Users.Response;
 using socialmedia.Exceptions;
 using socialmedia.Repositories;
 using socialmedia.Services.Interfaces;
@@ -53,6 +54,16 @@ namespace socialmedia.Services
             bool success = await _followRepository.RejectFollowRequestAsync(requestId);
             if (!success)
                 throw new KeyNotFoundException("Takip isteği bulunamadı.");
+        }
+
+        public async Task<List<UserSummaryDto>> GetFollowersAsync(long userId)
+        {
+            return await _followRepository.GetFollowersAsync(userId);
+        }
+
+        public async Task<List<UserSummaryDto>> GetFollowingAsync(long userId)
+        {
+            return await _followRepository.GetFollowingAsync(userId);
         }
     }
 }

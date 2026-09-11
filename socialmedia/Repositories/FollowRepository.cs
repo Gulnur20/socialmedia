@@ -63,6 +63,40 @@ namespace socialmedia.Repositories
             }
         }
 
+        public async Task<List<UserSummaryDto>> GetFollowersAsync(long userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                string sql = @"
+            SELECT u.UserID, u.Username, up.PPUrl
+            FROM Follow f
+            INNER JOIN Users u ON f.FollowerID = u.UserID
+            LEFT JOIN UserProfile up ON u.UserID = up.UserID
+            WHERE f.FollowingID = @UserId
+            ORDER BY u.Username";
+
+                var result = await connection.QueryAsync<UserSummaryDto>(sql, new { UserId = userId });
+                return result.ToList();
+            }
+        }
+
+        public async Task<List<UserSummaryDto>> GetFollowingAsync(long userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                string sql = @"
+            SELECT u.UserID, u.Username, up.PPUrl
+            FROM Follow f
+            INNER JOIN Users u ON f.FollowingID = u.UserID
+            LEFT JOIN UserProfile up ON u.UserID = up.UserID
+            WHERE f.FollowerID = @UserId
+            ORDER BY u.Username";
+
+                var result = await connection.QueryAsync<UserSummaryDto>(sql, new { UserId = userId });
+                return result.ToList();
+            }
+        }
+
 
         public async Task<string> FollowUserAsync(long followerID, long followingID)
         {

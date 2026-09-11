@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using socialmedia.DTOs.Users.Request;
 using socialmedia.Models;
 using System;
-
+using System.Collections.Generic;
+using socialmedia.DTOs.Users.Response;
 namespace socialmedia.Repositories.UserRepostories
 
 {
@@ -129,6 +130,39 @@ namespace socialmedia.Repositories.UserRepostories
             }
         }
 
+        public async Task<string?> GetPasswordHashAsync(long userId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string sql = "SELECT Password FROM Users WHERE UserID = @UserID";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@UserID", userId);
+                    await connection.OpenAsync();
+                    var result = await command.ExecuteScalarAsync();
+                    return result as string;
+                }
+            }
+        }
+
+        public async Task UpdatePasswordAsync(long userId, string newPasswordHash)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string sql = @"UPDATE Users SET Password = @Password WHERE UserID = @UserID;
+                       UPDATE UserSettings SET LastPasswordChanged = @Now WHERE UserID = @UserID";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@UserID", userId);
+                    command.Parameters.AddWithValue("@Password", newPasswordHash);
+                    command.Parameters.AddWithValue("@Now", DateTime.UtcNow);
+
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
         public async Task DeleteUserAsync(long userId, DateTime deletedDate)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -178,6 +212,44 @@ namespace socialmedia.Repositories.UserRepostories
                     return count > 0;
                 }
             }
+        }
+        public async Task<List<UserSearchResultDto>> SearchUsersAsync(string query)
+        {
+            var results = new List<UserSearchResultDto>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string sql = @"SELECT TOP 20 u.UserID, u.Username, p.FirstName, p.LastName, p.PPUrl
+                       FROM Users u
+                       JOIN UserProfile p ON u.UserID = p.UserID
+                       WHERE u.Username LIKE @Query
+                          OR p.FirstName LIKE @Query
+                          OR p.LastName LIKE @Query
+                       ORDER BY u.Username";
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Query", $"%{query}%");
+
+                    await connection.OpenAsync();
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            results.Add(new UserSearchResultDto
+                            {
+                                UserID = (long)reader["UserID"],
+                                Username = (string)reader["Username"],
+                                FirstName = (string)reader["FirstName"],
+                                LastName = (string)reader["LastName"],
+                                PPUrl = reader["PPUrl"] as string
+                            });
+                        }
+                    }
+                }
+            }
+
+            return results;
         }
 
         public async Task<Users?> GetByUsernameAsync(string username)

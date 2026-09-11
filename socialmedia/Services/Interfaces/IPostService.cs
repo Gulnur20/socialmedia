@@ -12,5 +12,7 @@ namespace socialmedia.Services.Interfaces
         Task DeletePostAsync(long postId, long userId);
         Task<bool> TogglePostLikeAsync(long postId, long userId);
         Task<PagedResultDto<PostDto>> GetTimelineAsync(long userId, int page, int pageSize);
+        Task<List<PostDto>> GetPostsByUserIdAsync(long userId, long currentUserId);
+        Task<List<PostLikeDto>> GetPostLikesAsync(long postId);
     }
 }
