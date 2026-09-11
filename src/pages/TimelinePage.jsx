@@ -4,6 +4,8 @@ import { getTimeline } from '../services/PostService'
 import PostCard from '../components/PostCard'
 import CreatePostForm from '../components/CreatePostForm'
 import Layout from '../components/Layout'
+import CreatePostModal from '../components/CreatePostModal'
+import { Plus } from 'lucide-react'
 
 function TimelinePage() {
     const { token } = useAuth()
@@ -13,7 +15,6 @@ function TimelinePage() {
     const [isLoading, setIsLoading] = useState(true)
     const [isLoadingMore, setIsLoadingMore] = useState(false)
     const [error, setError] = useState('')
-
     const observerRef = useRef(null)
     const loadMoreRef = useRef(null)
 
@@ -79,7 +80,7 @@ function TimelinePage() {
     return (
         <Layout>
             <div className="w-full max-w-[600px] mx-auto px-4 py-8">
-                <CreatePostForm onPostCreated={handlePostCreated} />
+
 
                 {isLoading && <p className="text-slate-400">Yükleniyor...</p>}
                 {error && <p className="text-red-500">{error}</p>}

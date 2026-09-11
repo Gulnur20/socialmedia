@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { getUserProfile } from '../services/UserService'
-import { Home, User, Settings, LogOut, Search, UserPlus } from 'lucide-react'
+import CreatePostModal from './CreatePostModal'
+import { User, Settings, LogOut, Search, UserPlus, PlusSquare } from 'lucide-react'
 
 function Layout({ children }) {
     const { user, token, logoutUser } = useAuth()
+    const [showCreateModal, setShowCreateModal] = useState(false)
     const [ppUrl, setPpUrl] = useState(null)
 
     useEffect(() => {
@@ -25,37 +27,47 @@ function Layout({ children }) {
         return <div>Kullanıcı bilgileri yükleniyor...</div>;
     }
 
-
     return (
         <div className="min-h-screen bg-[#0f141c] text-[#e2e8f0] flex">
             {/* Sol Sidebar */}
             <nav className="w-64 shrink-0 border-r border-[#1f2633] flex flex-col justify-between py-6 px-4 h-screen sticky top-0">
-                <div className="space-y-1">
+                <div className="space-y-4">
                     <div className="px-3 mb-6">
-                        <span className="text-lg font-semibold text-white tracking-tight">Nexus</span>
+                        <span className="text-lg font-semibold text-white tracking-tight">INTERN</span>
                     </div>
-
-
 
                     <Link
                         to="/timeline"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-[#1e2533] hover:text-white transition"
+                        title="Ana Akış"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium sidebar-link"
                     >
-                        <Home className="w-4.5 h-4.5" />
+                        <i className="bi bi-house-door" style={{ fontSize: '1.1rem' }}></i>
                         Ana Akış
                     </Link>
 
                     <Link
                         to="/search"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-[#1e2533] hover:text-white transition"
+                        title="Ara"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium sidebar-link"
                     >
                         <Search className="w-4.5 h-4.5" />
                         Ara
                     </Link>
 
+                    <button
+                        type="button"
+                        onClick={() => setShowCreateModal(true)}
+                        title="Yeni Gönderi"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium sidebar-link w-full text-left border-0 bg-transparent"
+                    >
+                        <PlusSquare className="w-4.5 h-4.5" />
+                        Yeni Gönderi
+                    </button>
+
                     <Link
                         to="/follow-requests"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-[#1e2533] hover:text-white transition"
+                        title="Takip İstekleri"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium sidebar-link"
                     >
                         <UserPlus className="w-4.5 h-4.5" />
                         Takip İstekleri
@@ -63,7 +75,8 @@ function Layout({ children }) {
 
                     <Link
                         to={`/profile/${user?.userID}`}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-[#1e2533] hover:text-white transition"
+                        title="Profilim"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium sidebar-link"
                     >
                         <User className="w-4.5 h-4.5" />
                         Profilim
@@ -71,14 +84,15 @@ function Layout({ children }) {
 
                     <Link
                         to="/profile/edit"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-[#1e2533] hover:text-white transition"
+                        title="Profili Düzenle"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium sidebar-link"
                     >
                         <Settings className="w-4.5 h-4.5" />
                         Profili Düzenle
                     </Link>
                 </div>
 
-                <div className="space-y-3 px-3">
+                <div className="space-y-4 px-3">
                     <Link
                         to={`/profile/${user.userID}`}
                         className="flex items-center gap-3 pb-3 border-t border-[#1f2633] pt-4 hover:opacity-80 transition"
@@ -94,13 +108,20 @@ function Layout({ children }) {
                     </Link>
                     <button
                         onClick={logoutUser}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-[#1e2533] hover:text-white transition"
+                        className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-[#1e2533] hover:text-white transition"
                     >
                         <LogOut className="w-4.5 h-4.5" />
                         Çıkış Yap
                     </button>
                 </div>
             </nav>
+
+            {showCreateModal && (
+                <CreatePostModal
+                    onClose={() => setShowCreateModal(false)}
+                    onPostCreated={() => setShowCreateModal(false)}
+                />
+            )}
 
             {/* Ana İçerik */}
             <main className="flex-1 bg-[#0f141c]">

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { toggleLike, deletePost, updatePost } from '../services/PostService'
 import CommentSection from './CommentSection'
 import LikesModal from './LikesModal'
+import MediaGallery from './MediaGallery'
 
 function PostModal({ post, onClose, onPostDeleted, onPostUpdated }) {
     const { token, user } = useAuth()
@@ -65,11 +66,7 @@ function PostModal({ post, onClose, onPostDeleted, onPostUpdated }) {
                 {/* Sol: Medya */}
                 <div className="hidden sm:flex flex-1 bg-black items-center justify-center min-w-0">
                     {post.media && post.media.length > 0 ? (
-                        <img
-                            src={post.media[0].mediaURL}
-                            alt={caption || 'post'}
-                            className="max-w-full max-h-[85vh] object-contain"
-                        />
+                        <MediaGallery media={post.media} caption={caption} />
                     ) : (
                         <p className="text-slate-500 text-sm">Medya yok</p>
                     )}
@@ -162,7 +159,7 @@ function PostModal({ post, onClose, onPostDeleted, onPostUpdated }) {
                     </div>
 
                     {/* Alt: Beğeni */}
-                    <div className="border-t border-[#1f2633] px-4 py-3 flex items-center justify-between">
+                    <div className="border-t border-[#1f2633] px-2 py-2 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={handleLikeClick}

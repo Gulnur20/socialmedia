@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Layout from '../components/Layout'
 import { getMyProfile, updateProfile, updateSettings, freezeAccount, deleteAccount, changePassword } from '../services/UserService'
+import { uploadFile } from '../services/UploadService'
 
 function EditProfilePage() {
     const { token, logoutUser } = useAuth()
@@ -24,6 +25,8 @@ function EditProfilePage() {
     const [passwordError, setPasswordError] = useState('')
     const [passwordSuccess, setPasswordSuccess] = useState('')
     const [isChangingPassword, setIsChangingPassword] = useState(false)
+    const [isUploading, setIsUploading] = useState(false)
+
     useEffect(() => {
         async function fetchProfile() {
             try {
@@ -42,6 +45,23 @@ function EditProfilePage() {
         }
         fetchProfile()
     }, [token])
+
+
+    async function handleFileChange(e) {
+        const file = e.target.files[0]
+        if (!file) return
+
+        setIsUploading(true)
+        setError('')
+        try {
+            const url = await uploadFile(token, file, 'profile')
+            setFormData({ ...formData, ppUrl: url })
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setIsUploading(false)
+        }
+    }
 
     function handleChange(e) {
         const { name, value } = e.target
@@ -178,14 +198,17 @@ function EditProfilePage() {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Profil Fotoğrafı URL</label>
+                            <label className={labelClass}>Profil Fotoğrafı</label>
                             <input
-                                type="text"
-                                name="ppUrl"
-                                value={formData.ppUrl}
-                                onChange={handleChange}
-                                className={inputClass}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className={`${inputClass} cursor-pointer`}
                             />
+                            {isUploading && <p className="text-xs text-slate-400 mt-1">Yükleniyor...</p>}
+                            {formData.ppUrl && !isUploading && (
+                                <img src={formData.ppUrl} alt="Önizleme" className="w-16 h-16 rounded-full object-cover mt-2" />
+                            )}
                         </div>
 
                         <div>

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { toggleLike, deletePost } from '../services/PostService'
 import CommentSection from './CommentSection'
 import LikesModal from './LikesModal'
+import MediaGallery from './MediaGallery'
 
 function PostCard({ post, onPostDeleted }) {
     const { token, user } = useAuth()
@@ -41,7 +42,7 @@ function PostCard({ post, onPostDeleted }) {
             {/* Başlık */}
             <div className="flex items-center justify-between px-4 py-3">
                 <Link to={`/profile/${post.author.userID}`} className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-tr from-[#6366f1] via-[#8b5cf6] to-[#06b6d4] flex items-center justify-center text-xs font-semibold text-white shrink-0">
+                    <div className="w-10  h-10 rounded-full overflow-hidden bg-gradient-to-tr from-[#6366f1] via-[#8b5cf6] to-[#06b6d4] flex items-center justify-center text-xs font-semibold text-white shrink-0">
                         {post.author.ppUrl ? (
                             <img src={post.author.ppUrl} alt={post.author.username} className="w-full h-full object-cover" />
                         ) : (
@@ -54,7 +55,8 @@ function PostCard({ post, onPostDeleted }) {
                 {isOwnPost && (
                     <button
                         onClick={handleDeleteClick}
-                        className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition"
+                        className="btn btn-danger"
+                        type="button"
                         title="Sil"
                     >
                         <Trash2 className="w-4 h-4" />
@@ -64,27 +66,21 @@ function PostCard({ post, onPostDeleted }) {
 
             {/* Medya */}
             {post.media && post.media.length > 0 && (
-                <div className="bg-black">
-                    <img
-                        src={post.media[0].mediaURL}
-                        alt={post.caption || 'post'}
-                        className="w-full max-h-[600px] object-contain"
-                    />
-                </div>
+                <MediaGallery media={post.media} caption={post.caption} />
             )}
 
             {/* Aksiyonlar */}
-            <div className="px-4 pt-3 flex items-center gap-4">
+            <div className="px-5 pt-3 flex items-center gap-4">
                 <button onClick={handleLikeClick} className="text-white hover:opacity-70 transition">
                     <Heart className={`w-6 h-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
                 </button>
                 <button onClick={() => setShowComments(!showComments)} className="text-white hover:opacity-70 transition">
-                    <MessageCircle className="w-6 h-6" />
+                    <MessageCircle className="w-5 h-5" />
                 </button>
             </div>
 
             {/* Beğeni / yorum sayacı */}
-            <div className="px-4 pt-2 flex items-center gap-3 text-sm">
+            <div className="px-5 pt3 flex items-center gap-3 text-sm">
                 <button
                     onClick={() => setShowLikes(true)}
                     className="text-white font-semibold hover:underline"
@@ -103,14 +99,14 @@ function PostCard({ post, onPostDeleted }) {
 
             {/* Caption */}
             {post.caption && (
-                <p className="px-4 pt-2 text-sm text-slate-200">
+                <p className="px-5 pt-2 text-sm text-slate-200">
                     <span className="font-semibold text-white mr-1.5">{post.author.username}</span>
                     {post.caption}
                 </p>
             )}
 
             {/* Yorumlar */}
-            <div className="px-4 pb-4">
+            <div className="px-5 pb-5">
                 {showComments && <CommentSection postId={post.postID} />}
             </div>
 
